@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+    <!-- Project properties -->
+    <PropertyGroup>
+        <AssemblyName>SimpleMusicPlayer</AssemblyName>
+        <RootNamespace>SimpleMusicPlayer</RootNamespace>
+        <DisableFody Condition=" '$(Configuration)' == 'Debug' ">true</DisableFody>
+        <!-- Workaround for https://github.com/dotnet/sourcelink/issues/91 -->
+        <DeterministicSourcePaths Condition="'$(EnableSourceLink)' == ''">false</DeterministicSourcePaths>
+        <UseWindowsForms>true</UseWindowsForms>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <NoWarn>SA1652;WPF0041</NoWarn>
+        <ApplicationIcon>simplemp.ico</ApplicationIcon>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
+
+    <ItemGroup Condition=" '$(Platform)' == 'x86' ">
+        <EmbeddedResource Include="$(SolutionDir)libs\FMODStudio\x86\fmod.dll">
+            <Link Condition=" '$(Configuration)' != 'Debug' ">costura32\fmod.dll</Link>
+            <CopyToOutputDirectory Condition=" '$(Configuration)' == 'Debug' ">Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+    </ItemGroup>
+    <ItemGroup Condition=" '$(Platform)' != 'x86' ">
+        <EmbeddedResource Include="$(SolutionDir)libs\FMODStudio\x64\fmod.dll">
+            <Link Condition=" '$(Configuration)' != 'Debug' ">costura64\fmod.dll</Link>
+            <CopyToOutputDirectory Condition=" '$(Configuration)' == 'Debug' ">Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="taglib-sharp.dll">
+            <HintPath>$(SolutionDir)libs\taglib-sharp\taglib-sharp.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="NLog" Version="5.0.4" />
+        <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
+        <PackageReference Include="QuickIO.NET" Version="2.6.2" />
+        <PackageReference Include="TinyIoC" Version="1.3.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="ReactiveUI" Version="7.4.0" />
+        <PackageReference Include="reactiveui-events" Version="7.4.0" />
+        <PackageReference Include="Splat" Version="1.6.2" />
+        <PackageReference Include="MahApps.Metro" Version="2.4.9" />
+        <PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.0.0" />
+        <PackageReference Include="MahApps.Metro.IconPacks.Entypo" Version="4.11.0" />
+        <PackageReference Include="MahApps.Metro.IconPacks.FontAwesome" Version="4.11.0" />
+        <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
+        <PackageReference Include="MahApps.Metro.IconPacks.MaterialLight" Version="4.11.0" />
+        <PackageReference Include="MahApps.Metro.IconPacks.Modern" Version="4.11.0" />
+        <PackageReference Include="MahApps.Metro.IconPacks.Octicons" Version="4.11.0" />
+        <PackageReference Include="gong-wpf-dragdrop" Version="3.2.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(DefineConstants.Contains(NETCOREAPP)) == false">
+        <PackageReference Include="MaterialDesignThemes" Version="3.0.1" />
+        <PackageReference Include="MaterialDesignColors" Version="1.2.7" />
+        <PackageReference Include="Fody" Version="6.*">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Costura.Fody" Version="4.*" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(DefineConstants.Contains(NETCOREAPP)) == true">
+        <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />
+        <PackageReference Include="MaterialDesignColors" Version="2.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="$(SolutionDir)libs\FMODStudio\csharp\*.cs" Link="FMODStudio\%(RecursiveDir)%(Filename)%(Extension)" />
+        <None Include="app.manifest" />
+        <None Remove="App.config" />
+        <AppConfigWithTargetPath Include="App.$(TargetFramework).config" Condition="$(DefineConstants.Contains(NETCOREAPP)) == false">
+            <TargetPath>$(AssemblyName).exe.config</TargetPath>
+        </AppConfigWithTargetPath>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile DependentUpon="%(Filename)" SubType="Code" Update="**\obj\**\*.g$(DefaultLanguageSourceExtension)" />
+        <Compile DependentUpon="%(Filename)" SubType="Designer" Update="**\*.xaml$(DefaultLanguageSourceExtension)" />
+    </ItemGroup>
+</Project>
